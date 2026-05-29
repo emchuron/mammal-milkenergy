@@ -12,10 +12,9 @@ milkenergy<-readxl::read_xlsx(file.path(here("data","Milk intake data.xlsx")), s
                               col_types = c(rep("text",4), rep("numeric",9), "text","text","text"))|>
   mutate(CommonName=factor(CommonName),
          Family=case_when(Family=="Delphinidae" | Family=="Phocoenidae"~"Delphinidae/Phocoenidae",.default=Family))|>
-  filter(is.na(Exclude)) 
-
-colnames(milkenergy)<-c("CommonName","SciName","Family","Order","N","Age","LactationDuration","TimeIntoLactation","Milkenergykjg","MilkenergySD","MilkenergySE",
-                        "MilkenergyMin","MilkenergyMax","Reference","Comments","Exclude")
+  filter(is.na(Exclude)) |>
+  setNames(c("CommonName","SciName","Family","Order","N","Age","LactationDuration","TimeIntoLactation","Milkenergykjg","MilkenergySD","MilkenergySE",
+                        "MilkenergyMin","MilkenergyMax","Reference","Comments","Exclude"))
 
 milkenergy$MilkenergySD[is.na(milkenergy$MilkenergySD) | milkenergy$MilkenergySD==0]<-0.001
 milkenergy$MilkenergyMin[is.na(milkenergy$MilkenergyMin)]<--Inf
@@ -78,72 +77,72 @@ HFamilyOtariid<-milkenergyNew |>
   filter(Family=="Otariidae")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp"),
-                                     data = .x, method="REML", family=gaussian(),gamma=1.4)))
+  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp",k=5),
+                                     data = .x, method="REML", family=gaussian())))
 
 HFamilyPhocid<-milkenergyNew |>
   filter(Family=="Phocidae")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp"),
-                                     data = .x, method="REML", family=gaussian(),gamma=1.4)))
-        
+  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp",k=5),
+                                     data = .x, method="REML", family=gaussian())))
+         
 HFamilyUrsid<-milkenergyNew |>
   filter(Family=="Ursidae")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp"),
-                                     data = .x, method="REML", family=gaussian(),gamma=1.4)))
+  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp",k=5),
+                                     data = .x, method="REML", family=gaussian())))
 
 HFamilyMustelid<-milkenergyNew |>
   filter(Family=="Mustelidae")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp"),
-                                     data = .x, method="REML", family=gaussian(),gamma=1.4)))
+  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp",k=5),
+                                     data = .x, method="REML", family=gaussian())))
 
 HFamilyBovidae<-milkenergyNew |>
   filter(Family=="Bovidae" & Population==1)|>
   group_by(Order,Family,Population)|>
   nest()|>
   mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp",k=5),
-                                     data = .x, method="REML", family=gaussian(),gamma=1.4)))
+                                     data = .x, method="REML", family=gaussian())))
 
 HFamilyCervidae<-milkenergyNew |>
   filter(Family=="Cervidae")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp"),
-                                     data = .x, method="REML", family=gaussian(),gamma=1.4)))
+  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp",k=5),
+                                     data = .x, method="REML", family=gaussian())))
         
 HFamilyDelphinidae<-milkenergyNew |>
   filter(Family=="Delphinidae/Phocoenidae")|>
   group_by(Order,Population)|>
   nest()|>
-  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp"),
-                                     data = .x, method="REML", family=gaussian(),gamma=1.4)),
+  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp",k=5),
+                                     data = .x, method="REML", family=gaussian())),
          Family="Delphinidae/Phocoenidae")
 
 HFamilyCamelidae<-milkenergyNew |>
   filter(Family=="Camelidae")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp"),
-                                     data = .x, method="REML", family=gaussian(),gamma=1.4)))
+  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp",k=5),
+                                     data = .x, method="REML", family=gaussian())))
         
 HFamilyGiraffidae<-milkenergyNew |>
   filter(Family=="Giraffidae" & Population==1)|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG=map(data,~ mgcv::gam(response ~s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp"),
-                                     data = .x, method="REML", family=gaussian(),gamma=1.4)))
+  mutate(modelG=map(data,~ mgcv::gam(response ~s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp",k=5),
+                                     data = .x, method="REML", family=gaussian())))
 
 HFamilyElephantidae<-milkenergyNew |>
   filter(Family=="Elephantidae"  & Population==1)|>
   group_by(Order,Family, Population)|>
   nest()|>
-  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp"),
-                                     data = .x, method="REML", family=gaussian(),gamma=1.4)))
+  mutate(modelG=map(data,~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp",k=5),
+                                     data = .x, method="REML", family=gaussian())))
          
 # Save model outputs -------------------------------------------------
 
@@ -160,10 +159,9 @@ linkTransform<-gratia::inv_link(HFamily$modelG[[1]])
 PFamily<-HFamily |>
   mutate(predicted = map(modelG,~ tidygam::predict_gam(.x, values=list(TimeIntoLactation=seq(0,1,by=0.001)),tran_fun=linkTransform))) |>
   unnest(predicted) |>
-  select(-c(modelG,data))
+  select(-c(modelG,data))|>
+  mutate(across(c(response, se, lower_ci, upper_ci), round,digits=3))
 
 
-saveRDS(PFamily, file=file.path(here("predictions","Milk energy density GAM predictions.rds")))
-
-
+fst::write_fst(PFamily,here("predictions","Milk energy density GAM predictions.fst"), compress = 100)
 

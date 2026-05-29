@@ -11,11 +11,10 @@ library(broom)
 
 milkintake<-readxl::read_xlsx(here("data","Milk intake data.xlsx"), sheet="Milk intake data - final") |>
   filter(is.na(Exclude) & is.na(Perinatal))|>
-  mutate(Family=as.factor(Family), CommonName=as.factor(CommonName))
-
-colnames(milkintake)<-c("CommonName","SciName","Family","Order","N","LitterSize","MaternalMass","OffspringMass","Age","LactationDuration","TimeIntoLactation",
+  mutate(Family=as.factor(Family), CommonName=as.factor(CommonName))|>
+  setNames(c("CommonName","SciName","Family","Order","N","LitterSize","MaternalMass","OffspringMass","Age","LactationDuration","TimeIntoLactation",
                         "MilkIntakegday","MilkIntakeSE","MilkIntakeSD","MilkIntakeMin", "MilkIntakeMax"
-                        ,"Method","Reference","Comments","Exclude","Checked","OffspringMassSD","BirthMass","FTDuration","Perinatal")
+                        ,"Method","Reference","Comments","Exclude","Checked","OffspringMassSD","BirthMass","FTDuration","Perinatal"))
 
 
 # Summarise data ----------------------------------------------------------
@@ -83,36 +82,35 @@ simCheck<-subset(milkintakeNew, N>1) |>
             SimMass=mean(SOffspringMass),Sim=mean(SMilkIntakegday/SOffspringMass^0.82),
             SimDiff=(Real-Sim)/Real)
 
-
 # Analysis ----------------------------------------------------------------
 
 HFamilyOtariid<-milkintakeNew |>
   filter(Family=="Otariidae")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG = map(data, ~ mgcv::gam(response ~ s(CommonName,bs="re") + s(TimeIntoLactation,bs="tp"),
-                                        ,data = .x, method="REML", family=gaussian(link="log"), gamma=1.4)))
+  mutate(modelG = map(data, ~ mgcv::gam(response ~ s(CommonName,bs="re") + s(TimeIntoLactation,bs="tp",k=5),
+                                        ,data = .x, method="REML", family=gaussian(link="log"))))
 
 HFamilyUrsidCub<-milkintakeNew |>
   filter(Family=="Ursidae" & Comments=="On a per cub basis")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG = map(data, ~ mgcv::gam(response ~ s(CommonName,bs="re") + s(TimeIntoLactation, bs="tp"),
-                                        data = .x, method="REML", family=gaussian(link="log"), gamma=1.4)))
+  mutate(modelG = map(data, ~ mgcv::gam(response ~ s(CommonName,bs="re") + s(TimeIntoLactation, bs="tp",k=5),
+                                        data = .x, method="REML", family=gaussian(link="log"))))
 
 HFamilyMustelidKit<-milkintakeNew |>
   filter(Family=="Mustelidae" & Comments=="On a per kit basis")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG = map(data, ~ mgcv::gam(response ~ s(TimeIntoLactation, bs="tp",k=7),
-                                        data = .x, method="REML", family=gaussian(link="log"),gamma=1.4)))
+  mutate(modelG = map(data, ~ mgcv::gam(response ~ s(TimeIntoLactation, bs="tp",k=5),
+                                        data = .x, method="REML", family=gaussian(link="log"))))
 
 HFamilyMustelidLitter<-milkintakeNew |>
   filter(Family=="Mustelidae" & Comments=="On a per litter basis")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG = map(data, ~ mgcv::gam(response ~ s(TimeIntoLactation, bs="tp",k=7),
-                                        data = .x, method="REML", family=gaussian(link="log"),gamma=1.4)))
+  mutate(modelG = map(data, ~ mgcv::gam(response ~ s(TimeIntoLactation, bs="tp",k=5),
+                                        data = .x, method="REML", family=gaussian(link="log"))))
 
 # Just see how they compare
 draw(compare_smooths(HFamilyMustelidLitter$modelG[[1]],HFamilyMustelidKit$modelG[[1]]))
@@ -121,39 +119,37 @@ HFamilyPhocid<-milkintakeNew |>
   filter(Family=="Phocidae")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG = map(data, ~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp"),
-                                        ,data = .x, method="REML", family=gaussian(link="log"),gamma=1.4)))
+  mutate(modelG = map(data, ~ mgcv::gam(response ~ s(CommonName, bs="re") + s(TimeIntoLactation, bs="tp",k=5),
+                                        ,data = .x, method="REML", family=gaussian(link="log"))))
         
 HFamilyCervidae<-milkintakeNew |>
   filter(Family=="Cervidae")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelNull = map(data, ~ mgcv::gam(response ~ s(CommonName,bs="re"),
-                                           data = .x, method="REML", family=gaussian(link="log"))),
-         modelG = map(data, ~ mgcv::gam(response~  s(TimeIntoLactation, bs="tp") + s(CommonName, bs="re"),
-                                        data = .x, method="REML", family=gaussian(link="log"),gamma=1.4)))
+  mutate(modelG = map(data, ~ mgcv::gam(response~  s(TimeIntoLactation, bs="tp",k=5) + s(CommonName, bs="re"),
+                                        data = .x, method="REML", family=gaussian(link="log"))))
 
 HFamilyBovidae<-milkintakeNew |>
   filter(Family=="Bovidae")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG = map(data, ~ mgcv::gam(response~  s(TimeIntoLactation,bs="tp"),
-                                        data = .x, method="REML", family=gaussian(link="log"),gamma=1.4)))
+  mutate(modelG = map(data, ~ mgcv::gam(response~  s(TimeIntoLactation,bs="tp",k=5),
+                                        data = .x, method="REML", family=gaussian(link="log"))))
 
 HFamilyCamelidae<-milkintakeNew |>
   filter(Family=="Camelidae")|>
   group_by(Order,Family,Population)|>
   nest()|>
-  mutate(modelG = map(data, ~ mgcv::gam(response~  s(TimeIntoLactation,bs="tp",k=7),
-                                        data = .x, method="REML", family=gaussian(link="log"),gamma=1.4)))
+  mutate(modelG = map(data, ~ mgcv::gam(response~  s(TimeIntoLactation,bs="tp",k=5),
+                                        data = .x, method="REML", family=gaussian(link="log"))))
 
 HFamilyArtiodactyla<-milkintakeNew |>
   filter(Order=="Artiodactyla" & paste(Family,Population,sep="_")!="Camelidae_33")|>
   group_by(Population)|>
   nest()|>
   mutate(Order="Artiodactyla",Family="Artiodactyla",
-            modelG = map(data, ~ mgcv::gam(response~  s(TimeIntoLactation, bs="tp") + s(CommonName, bs="re"),
-                                        data = .x, method="REML", family=gaussian(link="log"),gamma=1.4)))
+            modelG = map(data, ~ mgcv::gam(response~  s(TimeIntoLactation, bs="tp") + s(CommonName, bs="re",k=5),
+                                        data = .x, method="REML", family=gaussian(link="log"))))
 
 draw(compare_smooths(HFamilyArtiodactyla$modelG[[1]],HFamilyBovidae$modelG[[1]],HFamilyCervidae$modelG[[1]],HFamilyCamelidae$modelG[[1]]))
 
@@ -162,7 +158,7 @@ draw(compare_smooths(HFamilyArtiodactyla$modelG[[1]],HFamilyBovidae$modelG[[1]],
 HFamily<-bind_rows(HFamilyPhocid, HFamilyOtariid, HFamilyArtiodactyla,
                    HFamilyUrsidCub,HFamilyMustelidKit)
 
-saveRDS(HFamily, file=file.path(here("output","Milk intake GAM output.rds")))
+saveRDS(HFamily, file=(here("output","Milk intake GAM output.rds")))
 
 
 # Predictions -------------------------------------------------------------
@@ -172,8 +168,8 @@ linkTransform<-gratia::inv_link(HFamily$modelG[[1]])
 PFamily<-HFamily |>
   mutate(predicted = map(modelG,~ tidygam::predict_gam(.x, values=list(TimeIntoLactation=seq(0,1,by=0.001)),tran_fun=linkTransform))) |>
   unnest(predicted) |>
-  select(-c(modelG,data))
+  select(-c(modelG,data)) |>
+  mutate(across(c(response, se, lower_ci, upper_ci), round,digits=3))
 
-saveRDS(PFamily, file=here("predictions","Milk intake GAM predictions.rds"))
-
+fst::write_fst(PFamily,here("predictions","Milk intake GAM predictions.fst"), compress = 100)
 
