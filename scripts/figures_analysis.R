@@ -239,6 +239,81 @@ gPhocidI<-PFamilyI |>
 
 ggsave(here("figures","S1 Fig.tiff"), gPhocidI, dpi=300, compression="lzw",width=10, height=7)
 
+gOtariidI<-PFamilyI |>
+  filter(Family=="Otariidae" & TimeIntoLactation>=0.03)|>
+  group_by(Family,CommonName,TimeIntoLactation)|>
+  dplyr::mutate(mResponse=mean(response),mlwrCI=mean(lower_ci), muprCI=mean(upper_ci)) |>
+  ungroup()|>
+  ggplot(aes(x=TimeIntoLactation, y=mResponse))+
+  geom_point(data=milkintake|>filter(Family=="Otariidae" & TimeIntoLactation>=0.03),aes(y=MilkIntakegday/OffspringMass^0.82,size=N), color=familycolors[3],alpha=0.3)+
+  geom_line(color=familycolors[3], linewidth=1, alpha=1)+
+  facet_wrap(~CommonName)+
+  guides(color = "none")+
+  ggthemes::theme_few()+
+  ylab(bquote("Milk intake rate (g"~day^-1~"g offspring"^-0.82*")"))+
+  xlab("Time into lactation")+
+  scale_x_continuous(label=scales::percent_format(), expand=c(0.01,0),
+                     breaks=c(0,0.25,0.5,0.75,1.0))
+
+ggsave(here("figures","S2 Fig.tiff"), gOtariidI, dpi=300, compression="lzw",width=10, height=7)
+
+
+
+gMustelidI<-PFamilyI |>
+  filter(Family=="Mustelidae" & TimeIntoLactation>=0.03)|>
+  group_by(Family,CommonName,TimeIntoLactation)|>
+  dplyr::mutate(mResponse=mean(response),mlwrCI=mean(lower_ci), muprCI=mean(upper_ci),
+                CommonName="American mink") |>
+  ungroup()|>
+  ggplot(aes(x=TimeIntoLactation, y=mResponse))+
+  geom_point(data=milkintake|>filter(Family=="Mustelidae" & TimeIntoLactation>=0.03),aes(y=MilkIntakegday/OffspringMass^0.82,size=N), color=familycolors[16],alpha=0.3)+
+  geom_line(color=familycolors[16], linewidth=1, alpha=1)+
+  facet_wrap(~CommonName)+
+  guides(color = "none")+
+  ggthemes::theme_few()+
+  ylab(bquote("Milk intake rate (g"~day^-1~"g offspring"^-0.82*")"))+
+  xlab("Time into lactation")+
+  scale_x_continuous(label=scales::percent_format(), expand=c(0.01,0),
+                     breaks=c(0,0.25,0.5,0.75,1.0))
+
+ggsave(here("figures","S3 Fig.tiff"), gMustelidI, dpi=300, compression="lzw",width=6, height=4)
+
+gUrsidI<-PFamilyI |>
+  filter(Family=="Ursidae" & TimeIntoLactation>=0.03)|>
+  group_by(Family,CommonName,TimeIntoLactation)|>
+  dplyr::mutate(mResponse=mean(response),mlwrCI=mean(lower_ci), muprCI=mean(upper_ci)) |>
+  ungroup()|>
+  ggplot(aes(x=TimeIntoLactation, y=mResponse))+
+  geom_point(data=milkintake|>filter(Family=="Ursidae" & TimeIntoLactation>=0.03),aes(y=MilkIntakegday/OffspringMass^0.82,size=N), color=familycolors[21],alpha=0.3)+
+  geom_line(color=familycolors[21], linewidth=1, alpha=1)+
+  facet_wrap(~CommonName)+
+  guides(color = "none")+
+  ggthemes::theme_few()+
+  ylab(bquote("Milk intake rate (g"~day^-1~"g offspring"^-0.82*")"))+
+  xlab("Time into lactation")+
+  scale_x_continuous(label=scales::percent_format(), expand=c(0.01,0),
+                     breaks=c(0,0.25,0.5,0.75,1.0))
+
+ggsave(here("figures","S4 Fig.tiff"), gUrsidI, dpi=300, compression="lzw",width=10, height=4)
+
+gArtiodactylI<-PFamilyI |>
+  filter(Family=="Artiodactyla" & TimeIntoLactation>=0.03)|>
+  group_by(Family,CommonName,TimeIntoLactation)|>
+  dplyr::mutate(mResponse=mean(response),mlwrCI=mean(lower_ci), muprCI=mean(upper_ci)) |>
+  ungroup()|>
+  ggplot(aes(x=TimeIntoLactation, y=mResponse))+
+  geom_point(data=milkintake|>filter(Order=="Artiodactyla" & TimeIntoLactation>=0.03),aes(y=MilkIntakegday/OffspringMass^0.82,size=N), color=familycolors[12],alpha=0.3)+
+  geom_line(color=familycolors[12], linewidth=1, alpha=1)+
+  facet_wrap(~CommonName)+
+  guides(color = "none")+
+  ggthemes::theme_few()+
+  ylab(bquote("Milk intake rate (g"~day^-1~"g offspring"^-0.82*")"))+
+  xlab("Time into lactation")+
+  scale_x_continuous(label=scales::percent_format(), expand=c(0.01,0),
+                     breaks=c(0,0.25,0.5,0.75,1.0))
+
+ggsave(here("figures","S5 Fig.tiff"), gArtiodactylI, dpi=300, compression="lzw",width=10, height=6)
+
 # Supplemental - Energy --------------------------------------------------------
 
 gPhocidE<-PFamilyE |>
