@@ -530,7 +530,7 @@ GMnCurve<-ggplot()+
   scale_x_continuous(label=scales::percent_format(), lim=c(0,0.3), expand=c(0.01,0.005))+
   ggthemes::theme_few()+
   xlab("Time into lactation")+
-  ylab(bquote("Milk intake rate (g"~day^-1~"g Offspring"^-0.82*")"))+
+  ylab(bquote("Milk intake rate (g"~day^-1~"g offspring"^-0.82*")"))+
   scale_color_manual(values=pals::kelly(22)[c(12,16,3,7,21)],name="")+
   theme(legend.position="none", axis.text=element_text(size=10),
         axis.title=element_text(size=10),
