@@ -1,3 +1,4 @@
+# Code to run GAMS on milk energy density data
 
 library(readxl)
 library(tidyverse)
@@ -15,6 +16,8 @@ milkenergy<-readxl::read_xlsx(file.path(here("data","Milk intake data.xlsx")), s
   filter(is.na(Exclude)) |>
   setNames(c("CommonName","SciName","Family","Order","N","Age","LactationDuration","TimeIntoLactation","Milkenergykjg","MilkenergySD","MilkenergySE",
                         "MilkenergyMin","MilkenergyMax","Reference","Comments","Exclude"))
+
+#milkenergy<-data.table::fread(here("data-sub", "Milk energy density data.csv)
 
 milkenergy$MilkenergySD[is.na(milkenergy$MilkenergySD) | milkenergy$MilkenergySD==0]<-0.001
 milkenergy$MilkenergyMin[is.na(milkenergy$MilkenergyMin)]<--Inf

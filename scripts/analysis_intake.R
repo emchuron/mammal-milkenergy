@@ -1,3 +1,4 @@
+# Code to run GAMS on milk intake rates
 library(readxl)
 library(ggplot2)
 library(tidyverse)
@@ -16,7 +17,7 @@ milkintake<-readxl::read_xlsx(here("data","Milk intake data.xlsx"), sheet="Milk 
                         "MilkIntakegday","MilkIntakeSE","MilkIntakeSD","MilkIntakeMin", "MilkIntakeMax"
                         ,"Method","Reference","Comments","Exclude","Checked","OffspringMassSD","BirthMass","FTDuration","Perinatal"))
 
-
+#milkintake<-data.table::fread(here("data-sub", "Milk intake data.csv)
 # Summarise data ----------------------------------------------------------
 
 milkintakeSum<-milkintake |>

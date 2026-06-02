@@ -1,3 +1,5 @@
+# Code to create the manuscript figures
+
 library(tidyverse)
 library(ggplot2)
 library(here)

@@ -1,3 +1,5 @@
+# Code to create data for Table 2
+
 library(tidyverse)
 library(mgcv)
 
